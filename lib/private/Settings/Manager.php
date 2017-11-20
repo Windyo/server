@@ -32,6 +32,7 @@ namespace OC\Settings;
 use OC\Accounts\AccountManager;
 use OCP\App\IAppManager;
 use OCP\AppFramework\QueryException;
+use OCP\AutoloadNotAllowedException;
 use OCP\Encryption\IManager as EncryptionManager;
 use OCP\IConfig;
 use OCP\IDBConnection;
@@ -471,6 +472,9 @@ class Manager implements IManager {
 				$settings[$row['priority']][] = $this->query($row['class']);
 			} catch (QueryException $e) {
 				// skip
+			} catch (AutoloadNotAllowedException $e) {
+				// skip error and remove remnant of disabled app
+				$this->mapper->remove(Mapper::TABLE_ADMIN_SETTINGS, $row['class']);
 			}
 		}
 
